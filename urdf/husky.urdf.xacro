@@ -58,7 +58,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:arg name="laser_ust10_front_enabled" default="$(optenv HUSKY_UST10_ENABLED 0)" />
   <xacro:arg name="laser_ust10_front_topic"   default="$(optenv HUSKY_UST10_TOPIC front/scan)" />
   <xacro:arg name="laser_ust10_front_prefix"  default="$(optenv HUSKY_UST10_PREFIX front)" />
-  <xacro:arg name="laser_ust10_front_parent"  default="$(optenv HUSKY_UST10_PARENT top_plate_link)" />
+  <xacro:arg name="laser_ust10_front_parent"  default="$(optenv HUSKY_UST10_PARENT base_link)" />
   <xacro:arg name="laser_ust10_front_xyz"     default="$(optenv HUSKY_UST10_XYZ 0.2206 0.0 0.00635)" />
   <xacro:arg name="laser_ust10_front_rpy"     default="$(optenv HUSKY_UST10_RPY 0 0 0)" />
 
@@ -169,10 +169,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:property name="wheel_length" value="0.1143" />
   <xacro:property name="wheel_radius" value="0.1651" />
 
-  <link name="base_link_rotated">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-  </link>
-
 
   <!-- Base link is the center of the robot's bottom plate -->
   <link name="base_link">
@@ -206,11 +202,6 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
     <child link="base_footprint" />
   </joint>
 
-  <joint name="base_rotate_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
-    <parent link="base_link_rotated" />
-    <child link="base_link" />
-  </joint>
 
   <!-- Inertial link stores the robot's inertial information -->
   <link name="inertial_link">
