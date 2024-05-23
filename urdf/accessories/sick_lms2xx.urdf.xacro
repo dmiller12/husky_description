@@ -13,7 +13,7 @@
           izz="${0.0833333 * 1.1 * (0.105*0.105 + 0.102*0.102)}" />
       </inertial>
       <visual>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 1.5708" />
         <geometry>
           <!-- Origin of this mesh is the focal point of the LIDAR. -->
           <mesh filename="package://lms1xx/meshes/SICK_LM200-LM291.stl" scale="0.001 0.001 0.001"/>

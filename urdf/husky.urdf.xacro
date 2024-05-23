@@ -46,6 +46,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:arg name="laser_secondary_xyz"     default="$(optenv HUSKY_LMS1XX_SECONDARY_XYZ -0.2206 0.0 0.00635)" />
   <xacro:arg name="laser_secondary_rpy"     default="$(optenv HUSKY_LMS1XX_SECONDARY_RPY 0.0 0.0 3.14159)" />
 
+  <xacro:arg name="laser_lms2xx_secondary_enabled" default="$(optenv HUSKY_LMS2XX_SECONDARY_ENABLED 0)" />
+  <xacro:arg name="laser_lms2xx_secondary_topic"   default="$(optenv HUSKY_LMS2XX_SECONDARY_TOPIC front/scan)"/>
+  <xacro:arg name="laser_lms2xx_secondary_tower"   default="$(optenv HUSKY_LMS2XX_SECONDARY_TOWER 0)"/>
+  <xacro:arg name="laser_lms2xx_secondary_prefix"  default="$(optenv HUSKY_LMS2XX_SECONDARY_PREFIX rear)"/>
+  <xacro:arg name="laser_lms2xx_secondary_parent"  default="$(optenv HUSKY_LMS2XX_SECONDARY_PARENT base_link)"/>
+  <xacro:arg name="laser_lms2xx_secondary_xyz"     default="$(optenv HUSKY_LMS2XX_SECONDARY_XYZ -0.2206 0.0 0.00635)" />
+  <xacro:arg name="laser_lms2xx_secondary_rpy"     default="$(optenv HUSKY_LMS2XX_SECONDARY_RPY 0.0 0.0 3.14159)" />
+
   <!-- UST10 Laser Primary  and Secondary -->
   <xacro:arg name="laser_ust10_front_enabled" default="$(optenv HUSKY_UST10_ENABLED 0)" />
   <xacro:arg name="laser_ust10_front_topic"   default="$(optenv HUSKY_UST10_TOPIC front/scan)" />
@@ -140,6 +148,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:include filename="$(find husky_description)/urdf/accessories/flir_blackfly_mount.urdf.xacro"/>
   <xacro:include filename="$(find husky_description)/urdf/accessories/sensor_arch.urdf.xacro"/>
   <xacro:include filename="$(find husky_description)/urdf/accessories/sick_lms1xx_mount.urdf.xacro"/>
+  <xacro:include filename="$(find husky_description)/urdf/accessories/sick_lms2xx.urdf.xacro"/>
   <xacro:include filename="$(find husky_description)/urdf/accessories/vlp16_mount.urdf.xacro"/>
   <xacro:include filename="$(find husky_description)/urdf/decorations.urdf.xacro" />
   <xacro:include filename="$(find husky_description)/urdf/wheel.urdf.xacro" />
@@ -160,8 +169,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:property name="wheel_length" value="0.1143" />
   <xacro:property name="wheel_radius" value="0.1651" />
 
+  <link name="base_link_rotated">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </link>
+
+
   <!-- Base link is the center of the robot's bottom plate -->
   <link name="base_link">
+    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
@@ -189,6 +204,12 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
     <origin xyz="0 0 ${wheel_vertical_offset - wheel_radius}" rpy="0 0 0" />
     <parent link="base_link" />
     <child link="base_footprint" />
+  </joint>
+
+  <joint name="base_rotate_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 ${M_PI}" />
+    <parent link="base_link_rotated" />
+    <child link="base_link" />
   </joint>
 
   <!-- Inertial link stores the robot's inertial information -->
@@ -257,6 +278,18 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
     <xacro:sick_lms1xx_mount prefix="$(arg laser_secondary_prefix)" parent="$(arg laser_secondary_parent)" topic="$(arg laser_secondary_topic)" robot_namespace="$(arg robot_namespace)" tower="$(arg laser_secondary_tower)">
       <origin xyz="$(arg laser_secondary_xyz)" rpy="$(arg laser_secondary_rpy)"/>
     </xacro:sick_lms1xx_mount>
+  </xacro:if>
+  <!--
+    SICK LMS2XX Secondary Laser Scans
+  -->
+  <xacro:if value="$(arg laser_lms2xx_secondary_enabled)">
+    <xacro:sick_lms2xx  topic="$(arg laser_lms2xx_secondary_topic)" robot_namespace="$(arg robot_namespace)" />
+    <joint name="laser_joint" type="fixed">
+      <!-- This offset is from the base of the husky to the LIDAR's focal point. -->
+      <origin xyz="$(arg laser_lms2xx_secondary_xyz)" rpy="$(arg laser_lms2xx_secondary_rpy)"/>
+      <parent link="$(arg laser_lms2xx_secondary_parent)" />
+      <child link="laser" />
+    </joint>
   </xacro:if>
 
   <!--
